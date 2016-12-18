@@ -41,7 +41,11 @@ public class Shart extends JavaPlugin implements Listener {
                     this.cancel();
                 }
                 Item item = p.getLocation().getWorld().dropItemNaturally(p.getLocation(), is);
-                item.setVelocity(new Vector(r.nextFloat() * 2 - 1, 0.5, r.nextFloat() * 2  - 1));
+                if (getConfig().getString("source").equalsIgnoreCase("butt")) {
+                    item.setVelocity(p.getLocation().getDirection().normalize().multiply(-1));
+                } else {
+                    item.setVelocity(new Vector(r.nextFloat() * 2 - 1, 0.5, r.nextFloat() * 2  - 1));
+                }
                 item.setMetadata("SHART", new FixedMetadataValue(instance, true));
                 item.setPickupDelay(Integer.MAX_VALUE);
                 p.getLocation().getWorld().spigot().playEffect(item.getLocation(), Effect.POTION_SWIRL, 0, 0, 153/255, 76/255, 0/255, 1, 0, 16);
