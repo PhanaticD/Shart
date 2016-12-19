@@ -4,3 +4,4 @@ author: LaxWasHere
 main: com.phanaticmc.shart.Shart
 commands:
   shart:
+    aliases: [shit, poop, poo]
