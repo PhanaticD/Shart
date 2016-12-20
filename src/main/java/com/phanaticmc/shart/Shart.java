@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemMergeEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -54,6 +55,7 @@ public class Shart extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 1, 2);
         Item item = p.getLocation().getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.WOOL, 1, (short) 12));
         item.setCustomName(ChatColor.DARK_PURPLE + p.getName()+"\'s GIANT SHART");
+        item.setMetadata("SHART", new FixedMetadataValue(instance, true));
         item.setCustomNameVisible(true);
         item.setPickupDelay(Integer.MAX_VALUE);
         deleteItem(item, 120);
@@ -62,6 +64,13 @@ public class Shart extends JavaPlugin implements Listener {
     @EventHandler
     public void onMerge(ItemMergeEvent ev) {
         if (ev.getEntity().hasMetadata("SHART")) ev.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickUp(InventoryPickupItemEvent ev) {
+        if (ev.getItem().hasMetadata("SHART")) {
+            ev.setCancelled(true);
+        }
     }
 
     public void deleteItem(final Item item, int time) {
