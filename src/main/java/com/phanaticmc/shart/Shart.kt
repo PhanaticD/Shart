@@ -13,16 +13,16 @@ import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
-import java.util.*
+import java.util.Random
 
 /**
  * Created by Lax on 12/17/2016.
  */
 class Shart : JavaPlugin(), Listener {
 
-    var r = Random()
-    var instance: Shart? = null;
-    var `is` = ItemStack(Material.INK_SACK, 1, 3.toShort())
+    val r = Random()
+    lateinit var instance: Shart
+    val `is` = ItemStack(Material.INK_SACK, 1, 3.toShort())
 
     override fun onEnable() {
         instance = this
@@ -39,7 +39,7 @@ class Shart : JavaPlugin(), Listener {
                     this.cancel()
                 }
                 val item = p.location.world.dropItemNaturally(p.location, `is`)
-                if (config.getString("source").equals("butt", ignoreCase = true)) {
+                if (config.getString("source").equals("butt", true)) {
                     item.velocity = p.location.direction.normalize().multiply(-1)
                 } else {
                     item.velocity = Vector((r.nextFloat() * 2 - 1).toDouble(), 0.5, (r.nextFloat() * 2 - 1).toDouble())
@@ -51,7 +51,7 @@ class Shart : JavaPlugin(), Listener {
             }
         }.runTaskTimer(this, 1, 2)
         val item = p.location.world.dropItemNaturally(p.location, ItemStack(Material.WOOL, 1, 12.toShort()))
-        item.customName = p.name + "\'s GIANT SHART"
+        item.customName = "${p.name}'s GIANT SHART"
         item.setMetadata("SHART", FixedMetadataValue(instance, true))
         item.isCustomNameVisible = true
         item.pickupDelay = Integer.MAX_VALUE
@@ -65,9 +65,7 @@ class Shart : JavaPlugin(), Listener {
 
     @EventHandler
     fun onPickUp(ev: InventoryPickupItemEvent) {
-        if (ev.item.hasMetadata("SHART")) {
-            ev.isCancelled = true
-        }
+        if (ev.item.hasMetadata("SHART")) ev.isCancelled = true
     }
 
     fun deleteItem(item: Item, time: Int) {
