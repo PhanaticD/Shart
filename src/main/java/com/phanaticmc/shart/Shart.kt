@@ -1,5 +1,6 @@
 package com.phanaticmc.shart
 
+import org.bukkit.Bukkit
 import org.bukkit.Effect
 import org.bukkit.Material
 import org.bukkit.entity.Item
@@ -13,7 +14,7 @@ import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
-import java.util.Random
+import java.util.*
 
 /**
  * Created by Lax on 12/17/2016.
@@ -26,7 +27,8 @@ class Shart : JavaPlugin(), Listener {
 
     override fun onEnable() {
         instance = this
-        getCommand("shart").executor = Sharter(this)
+        getCommand("shart").executor = Sharter(this);
+        Bukkit.getPluginManager().registerEvents(this, this);
         saveDefaultConfig()
     }
 
