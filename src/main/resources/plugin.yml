@@ -1,7 +1,8 @@
 name: Shart
 version: 0.1
-author: LaxWasHere
+authors: [LaxWasHere, PhanaticD]
 main: com.phanaticmc.shart.Shart
+api-version: 1.13
 commands:
   shart:
     aliases: [shit, poop, poo]

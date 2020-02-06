@@ -1,8 +1,10 @@
 package com.phanaticmc.shart
 
 import org.bukkit.Bukkit
-import org.bukkit.Effect
+import org.bukkit.Color
 import org.bukkit.Material
+import org.bukkit.Particle
+import org.bukkit.Particle.DustOptions
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -16,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import java.util.*
 
+
 /**
  * Created by Lax on 12/17/2016.
  */
@@ -23,7 +26,7 @@ class Shart : JavaPlugin(), Listener {
 
     val r = Random()
     lateinit var instance: Shart
-    val `is` = ItemStack(Material.INK_SACK, 1, 3.toShort())
+    val `is` = ItemStack(Material.COCOA_BEANS)
 
     override fun onEnable() {
         instance = this
@@ -40,40 +43,45 @@ class Shart : JavaPlugin(), Listener {
                 if (i > config.getInt("sharts")) {
                     this.cancel()
                 }
-                val item = p.location.world.dropItemNaturally(p.location, `is`)
+                val item = p.location.world.dropItem(p.location.add(0.0,0.3,0.0).subtract(p.location.direction.normalize().multiply(0.3)), `is`)
                 if (config.getString("source").equals("butt", true)) {
-                    item.velocity = p.location.direction.normalize().multiply(-1)
+                    item.velocity = p.location.direction.normalize().multiply(-0.5)
                 } else {
                     item.velocity = Vector((r.nextFloat() * 2 - 1).toDouble(), 0.5, (r.nextFloat() * 2 - 1).toDouble())
                 }
-                item.setMetadata("SHART", FixedMetadataValue(instance, true))
+                item.setMetadata("no_pickup", FixedMetadataValue(instance, true))
                 item.pickupDelay = Integer.MAX_VALUE
-                p.location.world.spigot().playEffect(item.location, Effect.POTION_SWIRL, 0, 0, (153 / 255).toFloat(), (76 / 255).toFloat(), (0 / 255).toFloat(), 1f, 0, 16)
+                p.location.world.spawnParticle(Particle.REDSTONE, item.location.add(0.0, 0.3,0.0), 1, DustOptions(Color.fromRGB(102, 51, 0), 1F))
                 deleteItem(item, 40)
+
+                if(i % 5 == 0) {
+                    val bigitem = p.location.world.dropItem(p.location.add(0.0, 0.3, 0.0).subtract(p.location.direction.normalize().multiply(0.3)), ItemStack(Material.BROWN_WOOL, 2))
+                    if (config.getString("source").equals("butt", true)) {
+                        bigitem.velocity = p.location.direction.normalize().multiply(-0.1)
+                    }
+                    bigitem.setMetadata("no_pickup", FixedMetadataValue(instance, true))
+                    bigitem.pickupDelay = Integer.MAX_VALUE
+                    deleteItem(bigitem, 120)
+                }
             }
         }.runTaskTimer(this, 1, 2)
-        val item = p.location.world.dropItemNaturally(p.location, ItemStack(Material.WOOL, 1, 12.toShort()))
-        item.customName = "${p.name}'s GIANT SHART"
-        item.setMetadata("SHART", FixedMetadataValue(instance, true))
-        item.isCustomNameVisible = true
-        item.pickupDelay = Integer.MAX_VALUE
-        deleteItem(item, 120)
     }
 
     @EventHandler
     fun onMerge(ev: ItemMergeEvent) {
-        if (ev.entity.hasMetadata("SHART")) ev.isCancelled = true
+        if (ev.entity.hasMetadata("no_pickup")) ev.isCancelled = true
     }
 
     @EventHandler
     fun onPickUp(ev: InventoryPickupItemEvent) {
-        if (ev.item.hasMetadata("SHART")) ev.isCancelled = true
+        if (ev.item.hasMetadata("no_pickup")) ev.isCancelled = true
     }
 
     fun deleteItem(item: Item, time: Int) {
         object : BukkitRunnable() {
             override fun run() {
                 item.remove()
+                item.removeMetadata("no_pickup", instance)
             }
         }.runTaskLater(this, time.toLong())
     }
